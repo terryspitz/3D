@@ -7,7 +7,7 @@ shape = "ellipse";
 minor_radius = 0.5; // mm
 major_radius = 9.0 + minor_radius; // mm
 z_scale = 2; // ratio of z height to minor axis diameter
-twists = 3; //number of times the cross-section twists as it goes round the ring, fractional twists are possible for cross-sectional shapes with rotational symmetry.
+twists = 2; //number of times the cross-section twists as it goes round the ring, fractional twists are possible for cross-sectional shapes with rotational symmetry.
 
 function torus(az, theta) = let (
     // A torus with chosen cross-section: 
@@ -37,8 +37,7 @@ function torus(az, theta) = let (
     // or ellipse:
     eccentricity= 0.8,
     r_ellipse =  1/(1 + eccentricity * cos(theta)),
-    r0_ellipse = -(1 + cos(az*twists)/eccentricity/eccentricity/eccentricity),
-    r0_ellipse =0,
+    r0_ellipse = -(1 + cos(az*twists)/eccentricity/eccentricity),
     
     r = shape=="reuleaux" ? r_reuleaux : shape=="triangle" ? r_triangle : shape=="ellipse" ? r_ellipse : error,
     r0 = shape=="reuleaux"  ? r0_reuleaux : shape=="triangle" ? r0_triangle : shape=="ellipse" ? r0_ellipse : error,
