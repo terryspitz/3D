@@ -2,7 +2,6 @@
 // terryspitz@gmail.com July 2019
 
 $fn=12;
-
 //unit = 5; // mm
 //layer_height = 2; // mm
 
@@ -70,7 +69,22 @@ module vctrl_l() {
     color("yellow") vctrl();
 }
 module vctrl_r() {
+    //darkyellow
     color("#FFFFAA") vctrl();
+}
+module vcntr() {
+    linear_extrude(height=1)
+    for(bar=[0:4]) {
+        translate([0, bar*bar_height*2])
+        difference() {
+            square([7,bar_height*2]);
+            translate([1,1]) square([5,1]);
+            translate([1,3]) square([5,3]);
+        }
+    }
+}
+module vcntr_l() {
+    color("orange") vcntr();
 }
 module hctrl_base() {
     linear_extrude(height=1) {
@@ -95,20 +109,24 @@ module hctrl() {
 }
 
 //bits are the logical positions of the bars
-bits = [-1, 1, 1, -1, -1];
+bits = [1, 1, -1, -1, -1];
 bits_pos = [for(b=bits) b>0 ? b : 0];
 bits_neg = [for(b=bits) b<0 ? b : 0];
 
 //turn $t in [0,1] into a step_time up to 8 steps and iterate through all the bits values
 num_steps = 8;
 time = $t * num_steps * len(bits);
+//time=9;
 bit_offset = floor(time/num_steps);
 step_time = time % num_steps;
-scaled_time = floor(step_time) + min((step_time%1)*2, 1.0);
-echo("time: ", scaled_time);
+//spend half of each timestep stationary
+scaled_time = floor(step_time) + min((step_time%1)*2, 0.99);
+echo("time: ", bit_offset, scaled_time);
 
-function interp(vec) = let(x01=scaled_time%1) vec[min(scaled_time, len(vec)-1)] +
-    (vec[min(scaled_time+1, len(vec)-1)]-vec[min(scaled_time, len(vec)-1)])*x01;
+function interp(vec) =  let(x=scaled_time%1,
+                            y0=vec[min(scaled_time, len(vec)-1)],
+                            y1=vec[min(scaled_time+1, len(vec)-1)])
+                        y0 + (y1-y0)*x;
 
 function get_bit(bits, offset) = bits[(offset-bit_offset+len(bits))%len(bits)];
 
@@ -131,21 +149,23 @@ scale([xy_mm_per_unit, xy_mm_per_unit, z_height_mm]) {
         b2 = get_bit(bits,bar+2);
         b2p = get_bit(bits_pos,bar+2);
         //steps:   0   1       2     3   4   5       6     7,    8
-        bar_a_x = [0,  b1p,    b1,   b1, b1, b1,     b1,   0];
-        bar_b_x = [b0, b0,     b0,   0,  0,  b1p,    b1];
-        pin_r_x = [b1, b1+b1p, b1*2, 0,  0,  b0p,    b0];
-        pin_r_y = [2,  2,      2,    0,  0,  0,      0,    0,    2];
-        pin_l_x = [0,  b1p,    b1,   b1, b1, b1+b1p, b1*2, 0];
+        bar_a_x = [0,  b0p,    b0,   b0, b0, b0,     b0,   0];
+        bar_b_x = [b1, b1,     b1,   0,  0,  b0p,    b0];
+        echo(bar_b_x);
+        pin_r_x = [b1, b1+b1p, b1*2, 0,  0,  b0p,    b0,   b0,   b0];
+        pin_r_y = [6,  6,      6,    4,  4,  4,      4,    4,    6];
+        pin_l_x = [0,  b0p,    b0,   b0, b0, b0+b0p, b0*2, 0];
         pin_l_y = [0,  0,      0,    0,  2,  2,      2,    0];
 
         translate([0,bar_height*(bar-1)*2,0]) {
             translate([interp(bar_a_x), 0, bar_z]) bar_a();
             translate([interp(bar_b_x), bar_height, bar_z]) bar_b();
-            translate([interp(pin_r_x) + bar_a_width-3, interp(pin_r_y)-2, pin_z]) pin();
+            translate([interp(pin_r_x) + bar_a_width-3, interp(pin_r_y), pin_z]) pin();
             translate([interp(pin_l_x) + 2, interp(pin_l_y) +1, pin_z]) pin();
         }
     } //for bar
-    hctrl_x=[0,  1,      -1,   0,  0,  1,      -1,   0];
+    //steps:     0   1       2     3   4   5       6     7,    8
+    hctrl_x=    [0,  1,      -1,   0,  0,  1,      -1,   0];
     vctrl_r_y = [2,  2,      2,    0,  0,  0,      0,    0,    2];
     vctrl_l_y = [0,  0,      0,    0,  2,  2,      2,    0];
     translate([-1, interp(vctrl_l_y), vctrl_z]) vctrl_l();
