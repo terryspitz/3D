@@ -14,31 +14,31 @@ $fn=12;
 
 
 vctrl_width = 7;
-bar_a_width = 12;
+bar_width = 12;
 bar_height = 3;
 
 pin_z = 0;
-vctrl_z = 1;
-bar_z = 2;
-hctrl_z = 3;
+bar_z = 1;
+vctrl_z = 3;
+hctrl_z = 2;
+vcntr_z = 4;
 
-z_height_mm = 2; //mm
+z_height_mm = 4; //mm
 xy_mm_per_unit = 5;
 
 module pin() {
     color("red") translate([0.5,0.5,0]) {
         translate([0,0,1]) cylinder(5, d=1);
-        cylinder(d=2);
+        cylinder(d=2.8);
     }
 }
-
 module bar() {
     linear_extrude(height=1){
         difference() {
-            polygon([[0,0],[0,3],[1,3], [2,2], [2,1], [3,1], [3,2], [4,3],
-                    [bar_a_width,3], [bar_a_width,0],[bar_a_width-3,0]]);
-            translate([bar_a_width-4,0]) square();
-            translate([bar_a_width-2,0]) square();
+            polygon([[-2,0],[-2,3],[1,3], [2,2], [2,1], [3,1], [3,2], [4,3],
+                    [8,3], [8,2],[bar_width+3,2], [bar_width+3,0],[bar_width-3,0]]);
+            translate([bar_width-4,0]) square();
+            translate([bar_width-2,0]) square();
         }
     }
 }
@@ -46,12 +46,13 @@ module bar_a() {
     color("blue") {
         bar();
         linear_extrude(height=1)
-            translate([bar_a_width,0]) square([6,1]);
+            translate([bar_width,0]) square([8,1]);
+        translate([bar_width+7.5,0.5,1]) cylinder(2, d=1);
     }
 }
 module bar_b() {
-    color("#0000aa") 
-    translate([bar_a_width,0,0]) mirror([1,0,0]) bar();
+    color("darkblue")
+    translate([bar_width,0,0]) mirror([1,0,0]) bar();
 }
 
 module vctrl() {
@@ -76,34 +77,90 @@ module vcntr() {
     linear_extrude(height=1)
     for(bar=[0:4]) {
         translate([0, bar*bar_height*2])
-        difference() {
-            square([7,bar_height*2]);
-            translate([1,1]) square([5,1]);
-            translate([1,3]) square([5,3]);
+        union() {
+            square([1,bar_height*2]);
+            polygon([[0,0],[0,3],[1,3], [3,1], [4,1], [6,3], [7,3], [7,0]]);
+            translate([6,0]) square([1,bar_height*2]);
         }
     }
 }
 module vcntr_l() {
     color("orange") vcntr();
 }
-module hctrl_base() {
+module vcntr_r() {
+    color("darkorange") vcntr();
+}
+module hctrl_base(left, bottom=false, top=false) {
     linear_extrude(height=1) {
-        difference() {
-            square([8,2]);
-            translate([1,0]) square([2,1]);
-            translate([4,0]) square([3,1]);
+        translate([0,1]) square([8,1]);
+        if(!bottom) {
+            translate([3,0]) square([1,1]);
         }
-        translate([7,2]) square([1,4]);
-        translate([0,2]) square([1,4]);
+        if(!top) {
+            translate([0,3]) square([8,1]);
+            translate([7,3]) square([1,5]);
+            translate([0,3]) square([1,5]);
+        }
+        if(left)
+            translate([5,2]) square([2,1]);
+        else
+            translate([1,2]) square([2,1]);
     }
 }
 module hctrl() {
     color("green") 
     for(bar=[0:4]) {
-        translate([0, bar*bar_height*2])
-        {
-        translate([0,3]) hctrl_base();
-        translate([7,0]) hctrl_base();
+        translate([0, bar*bar_height*2]) {
+            translate([0,3]) hctrl_base(left=true, top=bar==4);
+            translate([7,0]) hctrl_base(left=false, bottom=bar==0, top=bar==4);
+        }
+    }
+}
+module pixel() {
+    color("white")
+    difference() {
+        union() {
+            difference() {
+                cylinder(r=3, h=1);
+                translate([0, 0, -1]) cube([bar_height, bar_height, 3]);
+                translate([-bar_height, -bar_height, -1]) cube([bar_height, bar_height, 3]);
+                cylinder(r=bar_height, h=1);
+            }
+            cylinder(r=2.5, h=1);
+        }
+        translate([0, 1, -1]) cylinder(d=2.5, h=3);
+    }
+}
+module base() {
+    color("grey") {
+        linear_extrude(height=1) {
+            square([vctrl_width*2+2,bar_height*11]);
+        }
+        translate([0, 0, 1]) {
+            linear_extrude(height=1) {
+                square([2,bar_height*11]);
+                translate([vctrl_width*2+1,0]) square([2,bar_height*11]);
+            }
+            linear_extrude(height=2) {
+                for(bar=[0:4]) {
+                    translate([0, bar*bar_height*2]) square([4,1]);
+                    translate([vctrl_width*2-2, bar*bar_height*2+3]) square([4,1]);
+                }
+            }
+        }
+        *translate([0, 0, 3])
+        linear_extrude(height=2) {
+            for(bar=[0:4]) {
+                translate([0, bar*bar_height*2]) square([3,1]);
+                translate([vctrl_width*2-1, bar*bar_height*2+3]) square([3,1]);
+            }
+        }
+        *translate([0, 0, 4])
+        linear_extrude(height=3) {
+            for(bar=[0:4]) {
+                translate([0, bar*bar_height*2]) square([1,1]);
+                translate([vctrl_width*2-1, bar*bar_height*2+3]) square([3,1]);
+            }
         }
     }
 }
@@ -116,7 +173,6 @@ bits_neg = [for(b=bits) b<0 ? b : 0];
 //turn $t in [0,1] into a step_time up to 8 steps and iterate through all the bits values
 num_steps = 8;
 time = $t * num_steps * len(bits);
-//time=9;
 bit_offset = floor(time/num_steps);
 step_time = time % num_steps;
 //spend half of each timestep stationary
@@ -128,10 +184,10 @@ function interp(vec) =  let(x=scaled_time%1,
                             y1=vec[min(scaled_time+1, len(vec)-1)])
                         y0 + (y1-y0)*x;
 
-function get_bit(bits, offset) = bits[(offset-bit_offset+len(bits))%len(bits)];
+function get_bit(bits, offset) = bits[(offset-bit_offset+len(bits)) % len(bits)];
 
 scale([xy_mm_per_unit, xy_mm_per_unit, z_height_mm]) {
-    translate([bar_a_width*1.2, 0, 0]) text(str(scaled_time), 5);
+    translate([bar_width*2, 8, 5]) linear_extrude(height=1) text(str(scaled_time), 5);
     for(bar=[1:len(bits)]) {
         // Position logic:
         // step 0: starting with bar_a ready to go
@@ -142,33 +198,42 @@ scale([xy_mm_per_unit, xy_mm_per_unit, z_height_mm]) {
         // step 5-6: bar_b & pins right then left
         // step 7-8: vctrl_l down, vctrl_r up
         // everything should finish in start position!
+        b_1 = get_bit(bits,bar-1);
         b0 = get_bit(bits,bar);
         b0p = get_bit(bits_pos,bar);
         b1 = get_bit(bits,bar+1);
         b1p = get_bit(bits_pos,bar+1);
-        b2 = get_bit(bits,bar+2);
-        b2p = get_bit(bits_pos,bar+2);
         //steps:   0   1       2     3   4   5       6     7,    8
         bar_a_x = [0,  b0p,    b0,   b0, b0, b0,     b0,   0];
         bar_b_x = [b1, b1,     b1,   0,  0,  b0p,    b0];
-        echo(bar_b_x);
         pin_r_x = [b1, b1+b1p, b1*2, 0,  0,  b0p,    b0,   b0,   b0];
         pin_r_y = [6,  6,      6,    4,  4,  4,      4,    4,    6];
         pin_l_x = [0,  b0p,    b0,   b0, b0, b0+b0p, b0*2, 0];
         pin_l_y = [0,  0,      0,    0,  2,  2,      2,    0];
+        pixel_rot=[b_1, b0p,    b0,   b0, b0, b0,     b0,   b0];
 
         translate([0,bar_height*(bar-1)*2,0]) {
             translate([interp(bar_a_x), 0, bar_z]) bar_a();
             translate([interp(bar_b_x), bar_height, bar_z]) bar_b();
-            translate([interp(pin_r_x) + bar_a_width-3, interp(pin_r_y), pin_z]) pin();
+            translate([interp(pin_r_x) + bar_width-3, interp(pin_r_y), pin_z]) pin();
             translate([interp(pin_l_x) + 2, interp(pin_l_y) +1, pin_z]) pin();
+            *translate([vctrl_width*2+5.5, 0.5, bar_z+1.5]) rotate([0, 0, interp(pixel_rot)*-45]) pixel();
         }
     } //for bar
     //steps:     0   1       2     3   4   5       6     7,    8
     hctrl_x=    [0,  1,      -1,   0,  0,  1,      -1,   0];
-    vctrl_r_y = [2,  2,      2,    0,  0,  0,      0,    0,    2];
     vctrl_l_y = [0,  0,      0,    0,  2,  2,      2,    0];
-    translate([-1, interp(vctrl_l_y), vctrl_z]) vctrl_l();
-    translate([vctrl_width-1, interp(vctrl_r_y)-bar_height, vctrl_z]) vctrl_r();
-    translate([interp(hctrl_x)-1, 0, hctrl_z]) hctrl();
+    vctrl_r_y = [2,  2,      2,    0,  0,  0,      0,    0,    2];
+    vcntr_l_y = [0,  0,      0,    0,  0,  0,      0,    2,    0];
+    vcntr_r_y = [0,  0,      0,    2,  0,  0,      0,    0];
+    *translate([0, 0, vctrl_z]) {
+        translate([-1, interp(vctrl_l_y), 0]) vctrl_l();
+        translate([vctrl_width-1, interp(vctrl_r_y)-bar_height, 0]) vctrl_r();
+    }
+    *translate([interp(hctrl_x)-1, 0, hctrl_z]) hctrl();
+    *translate([0, 0, vcntr_z]) {
+        translate([-1, interp(vcntr_l_y)-2, 0]) vcntr_l();
+        translate([vctrl_width-1, interp(vcntr_r_y)-2+bar_height, 0]) vcntr_r();
+    }
+    translate([-2, -1, -1]) base();
 }
