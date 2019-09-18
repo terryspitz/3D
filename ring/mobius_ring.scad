@@ -1,6 +1,6 @@
 
 //pick one shape:
-shape = "ellipse"; //["reuleaux", "triangle", "ellipse"]
+shape = "reuleaux"; //["reuleaux", "triangle", "ellipse"]
 
 // ring thickness radius in mm
 minor_radius = 1.2;  //[0.5:0.2:4.0]
@@ -12,7 +12,10 @@ major_radius = 11.0; //[7.0:0.5:12.0]
 z_scale = 2.5;  //[0.5:0.5:5.0]
 
 //number of times the cross-section twists as it goes round the ring, fractional twists are possible for cross-sectional shapes with rotational symmetry.
-twists = 1.5;  //[0.5:0.5:5]
+twists = 2.0;  //[0.5:0.5:5]
+
+//use a linear or uneven/oscillating twist around the ring
+use_linear = false;
 
 //0: circle, to <1 sharper ellipse
 ellipse_eccentricity= 0.8;  //[0.0:0.1:0.9]
@@ -27,7 +30,11 @@ function torus(az, theta) = let (
     
     mod_theta = theta % 120 - 60,
     cos_theta = cos(mod_theta),
-    twist = az*twists,
+    
+    linear_twist = az*twists,
+    az2 = az+$t*360,
+    oscillating_twist = az+(0*sin(az2))*twists,
+    twist = use_linear ? linear_twist : oscillating_twist,
     
     // Use Polar equation of a circle from https://en.wikipedia.org/wiki/Polar_coordinate_system#Circle
     // R=1, r0=1/sqrt(3) (2/3 height of unit sided equilateral triangle, offset of centre of reuleaux arc)
@@ -44,7 +51,7 @@ function torus(az, theta) = let (
     
     // or ellipse:
     r_ellipse =  1/sqrt(1 - pow(ellipse_eccentricity * cos(theta),2)),
-    r0_ellipse = 0,//-(1 + cos(az*twists)/eccentricity/eccentricity),
+    r0_ellipse = 0,
     
     r = shape=="reuleaux" ? r_reuleaux : shape=="triangle" ? r_triangle : shape=="ellipse" ? r_ellipse : error,
     r0 = shape=="reuleaux"  ? r0_reuleaux : shape=="triangle" ? r0_triangle : shape=="ellipse" ? r0_ellipse : error,
