@@ -1,6 +1,6 @@
 
 //pick one shape:
-shape = "reuleaux"; //["reuleaux", "triangle", "ellipse"]
+shape = "ellipse"; //["reuleaux", "triangle", "ellipse"]
 
 // ring thickness radius in mm
 minor_radius = 1.2;  //[0.5:0.2:4.0]
@@ -12,10 +12,10 @@ major_radius = 11.0; //[7.0:0.5:12.0]
 z_scale = 2.5;  //[0.5:0.5:5.0]
 
 //number of times the cross-section twists as it goes round the ring, fractional twists are possible for cross-sectional shapes with rotational symmetry.
-twists = 2.0;  //[0.5:0.5:5]
+twists = 1.5;  //[0.5:0.5:5]
 
 //use a linear or uneven/oscillating twist around the ring
-use_linear = false;
+use_linear = true;
 
 //0: circle, to <1 sharper ellipse
 ellipse_eccentricity= 0.8;  //[0.0:0.1:0.9]
@@ -33,7 +33,7 @@ function torus(az, theta) = let (
     
     linear_twist = az*twists,
     az2 = az+$t*360,
-    oscillating_twist = az+(0*sin(az2))*twists,
+    oscillating_twist = az+(0.9*sin(az2))*twists,
     twist = use_linear ? linear_twist : oscillating_twist,
     
     // Use Polar equation of a circle from https://en.wikipedia.org/wiki/Polar_coordinate_system#Circle
@@ -57,9 +57,11 @@ function torus(az, theta) = let (
     r0 = shape=="reuleaux"  ? r0_reuleaux : shape=="triangle" ? r0_triangle : shape=="ellipse" ? r0_ellipse : error,
     
     theta2 = theta + twist,  //twist it!
-    
+
+    //groove
+    minor_radius2 = minor_radius * ((theta+270) % 90 < 10 ? 0.7 : 1.0),
+    full_radius = major_radius + minor_radius2 * (r * cos(theta2) - r0),
     //based on parametric equation of a torus
-    full_radius = major_radius + minor_radius * (r * cos(theta2) - r0),
     x = sin(az) * full_radius,
     y = cos(az) * full_radius,
     z = r * sin(theta2) * minor_radius * z_scale
@@ -79,8 +81,8 @@ polyhedron(
     faces = let (step = floor(360/theta_step))
             concat(
                 [for (i = [0:step:360/az_step/zebra*step], j=[0:360/theta_step])
-                    [i+j,i+(j+1)%step,i+step+(j+1)%step]],
+                    [i+j,i+step+(j+1)%step,i+(j+1)%step]],
                 [for (i = [0:step:360/az_step/zebra*step], j=[0:360/theta_step])
-                    [i+step+(j+1)%step, i+step+j, i+j]]
+                    [i+step+(j+1)%step, i+j, i+step+j]]
             )
 );
