@@ -3,7 +3,7 @@
 
 $fn=12;
 
-part = "all";
+part = "top";
 echo("part", part);
 
 // components:
@@ -73,8 +73,8 @@ module vctrl_l() {
     color("yellow") vctrl();
 }
 module vctrl_r() {
-    darkyellow="#FFFFAA";
-    color(darkyellow) vctrl();
+    //darkyellow
+    color("#FFFFAA") vctrl();
 }
 module vcntr() {
     linear_extrude(height=1)
@@ -104,7 +104,10 @@ module hctrl_base(left, bottom=false, top=false) {
             translate([7,3]) square([1,5]);
             translate([0,3]) square([1,5]);
         }
-        translate([left ? 5 : 1,2]) square([2,1]);
+        if(left)
+            translate([5,2]) square([2,1]);
+        else
+            translate([1,2]) square([2,1]);
     }
 }
 module hctrl() {
