@@ -20,6 +20,9 @@ use_linear = true;
 //0: circle, to <1 sharper ellipse
 ellipse_eccentricity= 0.8;  //[0.0:0.1:0.9]
 
+//add a groove to the ring
+use_groove = false;
+
 function torus(az, theta) = let (
     // A torus with chosen cross-section: 
     // See https://en.wikipedia.org/wiki/Reuleaux_triangle.
@@ -59,7 +62,8 @@ function torus(az, theta) = let (
     theta2 = theta + twist,  //twist it!
 
     //groove
-    minor_radius2 = minor_radius * ((theta+270) % 90 < 10 ? 0.7 : 1.0),
+    minor_radius2 = use_groove ? minor_radius * ((theta+270) % 90 < 10 ? 0.7 : 1.0)
+                                : minor_radius ,
     full_radius = major_radius + minor_radius2 * (r * cos(theta2) - r0),
     //based on parametric equation of a torus
     x = sin(az) * full_radius,
