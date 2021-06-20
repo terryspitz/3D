@@ -3,3 +3,21 @@
 /Windows/
 /Thingiverse/
 /Prusa/
+
+# MPLAB
+build/
+desktop.ini
+*.p1
+*.i
+*.d
+*.cmf
+*.elf
+*.hxl
+*.lst
+*.map
+*.o
+*.sdb
+*.sym
+*.rlf
+memoryfile.xml
+private.xml

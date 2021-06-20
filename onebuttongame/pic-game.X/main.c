@@ -2,12 +2,12 @@
 
 #include "mcc_generated_files/mcc.h"
 
-//void xorshift(unsigned* rand)
-//{
-//    *rand ^= *rand << 7;
-//    *rand ^= *rand >> 9;
-//    *rand ^= *rand << 8;
-//}
+void xorshift(unsigned* rand)
+{
+    *rand ^= *rand << 7;
+    *rand ^= *rand >> 9;
+    *rand ^= *rand << 8;
+}
 
 typedef struct { uint8_t r; uint8_t g; uint8_t b; } RGB;
 typedef struct { uint8_t h; uint8_t s; uint8_t v; } HSV;
@@ -77,42 +77,35 @@ RGB HsvToRgb(uint8_t h, uint8_t s, uint8_t v) {
     RGB ret;
     if (s == 0) {
         ret.r = v; ret.g = v; ret.b = v;
-//        return (RGB) {v, v, v};
     } else {
 
         // converting to 16 bit to prevent overflow
         uint8_t region = h / 43;
-        uint16_t remainder = (h - (region * 43)) * 6;
+        uint16_t remainder = (uint16_t)(h - (region * 43)) * 6;
 
-        uint8_t p = (v * (255 - s)) >> 8;
-        uint8_t q = (v * (255 - ((s * remainder) >> 8))) >> 8;
-        uint8_t t = (v * (255 - ((s * (255 - remainder)) >> 8))) >> 8;
+        uint8_t p = ((uint16_t)v * (255 - s)) >> 8;
+        uint8_t q = ((uint16_t)v * (255 - ((s * remainder) >> 8))) >> 8;
+        uint8_t t = ((uint16_t)v * (255 - ((s * (255 - remainder)) >> 8))) >> 8;
 
         switch (region) {
-            case 0: return (RGB)
-            {
-                v, t, p
-            };
-            case 1: return (RGB)
-            {
-                q, v, p
-            };
-            case 2: return (RGB)
-            {
-                p, v, t
-            };
-            case 3: return (RGB)
-            {
-                p, q, v
-            };
-            case 4: return (RGB)
-            {
-                t, p, v
-            };
-            default: return (RGB)
-            {
-                v, p, q
-            };
+            case 0: 
+                ret.r = v; ret.g = t; ret.b = p; 
+                break;
+            case 1: 
+                ret.r = q; ret.g = v; ret.b = p;
+                break;
+            case 2:
+                ret.r = p; ret.g = v; ret.b = t;
+                break;
+            case 3:
+                ret.r = p; ret.g = q; ret.b = v;
+                break;
+            case 4:
+                ret.r = t; ret.g = p; ret.b = v;
+                break;
+            default:
+                ret.r = v; ret.g = p; ret.b = q;
+                break;
         }
     }
     return ret;
