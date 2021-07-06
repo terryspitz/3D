@@ -1,8 +1,8 @@
-//use <C:\Users\terry\Downloads\Product Sans Regular.ttf>
-//text = "Gogle";
-letter = "A";
-module print(letter) { text(letter, 72*1.5, "Product Sans:style=Bold"); }
+
 //text(text, 24, "Product Sans:style=Regular");
+module print(letter) { text(letter, 30, "Arial Rounded MT Bold:style=Regular"); }
+
+//text = "Gogle";
 //for(i = [0:len(text)]) {
     //let(letter=text[i])
     //translate([i*200, 0, 0]) union() {
@@ -13,7 +13,7 @@ module print(letter) { text(letter, 72*1.5, "Product Sans:style=Bold"); }
                 offset(3) print(letter);
                 print(letter);
             };
-        linear_extrude(9)
+        linear_extrude(12)
             difference() {
                 offset(1) print(letter);
                 print(letter);
