@@ -57,8 +57,8 @@ void SYSTEM_Initialize(void)
 
 void OSCILLATOR_Initialize(void)
 {
-    // LFIOFR 31.25KHz_osc_not_ready; HFIOFS unstable; HFIOFR 16MHz_osc_not_ready; IRCF 1MHz; 
-    OSCCON = 0x30;
+    // LFIOFR 31.25KHz_osc_not_ready; HFIOFS unstable; HFIOFR 16MHz_osc_not_ready; IRCF 16MHz; 
+    OSCCON = 0x70;
     // CLKROE disabled; 
     CLKRCON = 0x00;
     // SBOREN disabled; BORFS disabled; BORRDY BOR Circuit is inactive; 

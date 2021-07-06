@@ -2,6 +2,8 @@
 
 #include "mcc_generated_files/mcc.h"
 
+// next random int
+
 void xorshift(unsigned* rand)
 {
     *rand ^= *rand << 7;
@@ -35,11 +37,16 @@ void main(void)
     uint8_t hue = 0;
     while (1) {
         RGB rgb = HsvToRgb(hue++, 255, 128);
-        LED_RA0_PORT = 1;
-        for(uint8_t i=rgb.r; i; --i);
+        // LED duty cycle
+        for(uint8_t i=255; i; --i) {
+            LED_RA0_PORT = rgb.r > i;
+            LED_RA1_PORT = rgb.g > i;
+            LED_RA2_PORT = rgb.b > i;
+        }
         LED_RA0_PORT = 0;
-        for(uint8_t i=-rgb.r; i; --i);
-        __delay_ms(1);
+        LED_RA1_PORT = 0;
+        LED_RA2_PORT = 0;
+        __delay_ms(10);
     }
     
 //    uint16_t rand1 = 1;

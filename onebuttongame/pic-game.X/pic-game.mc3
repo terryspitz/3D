@@ -39,7 +39,7 @@
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="INTERNAL OSCILLATOR" name="CurrentSystemClockInHz"/>
-         <value>1000000</value>
+         <value>16000000</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="INTERNAL OSCILLATOR" name="CustomFOSC"/>
@@ -47,7 +47,7 @@
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="INTERNAL OSCILLATOR" name="CustomIRFC"/>
-         <value>1MHz</value>
+         <value>16MHz</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="INTERNAL OSCILLATOR" name="ExternalClock"/>
@@ -55,7 +55,7 @@
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="INTERNAL OSCILLATOR" name="FOSCClockValue"/>
-         <value>1000000</value>
+         <value>16000000</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="INTERNAL OSCILLATOR" name="HFIntOscClockInHz"/>
@@ -211,7 +211,7 @@
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.RegisterKey" moduleName="INTERNAL OSCILLATOR" registerAlias="OSCCON"/>
-         <value>48</value>
+         <value>112</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.SettingKey" moduleName="INTERNAL OSCILLATOR" registerAlias="BORCON" settingAlias="BORFS"/>
@@ -239,7 +239,7 @@
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.SettingKey" moduleName="INTERNAL OSCILLATOR" registerAlias="OSCCON" settingAlias="IRCF"/>
-         <value>1MHz</value>
+         <value>16MHz</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.SettingKey" moduleName="INTERNAL OSCILLATOR" registerAlias="OSCCON" settingAlias="LFIOFR"/>
@@ -843,7 +843,7 @@
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.RegisterKey" moduleName="System Module" registerAlias="CONFIG"/>
-         <value>8166</value>
+         <value>7910</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.SettingKey" moduleName="System Module" registerAlias="CONFIG" settingAlias="BOREN"/>
@@ -867,7 +867,7 @@
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.SettingKey" moduleName="System Module" registerAlias="CONFIG" settingAlias="LVP"/>
-         <value>ON</value>
+         <value>OFF</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.SettingKey" moduleName="System Module" registerAlias="CONFIG" settingAlias="MCLRE"/>
@@ -993,7 +993,7 @@
       </entry>
       <entry>
          <file>mcc_generated_files\device_config.h</file>
-         <hash>ec065ea12cead7e35e697c2b53dfb1708e4c7015beb4d1cbd0d66338c9cc003a</hash>
+         <hash>11041f1cbd82cd81602f3394e20d12832f00607b34860812f235cbd79d3764ed</hash>
       </entry>
       <entry>
          <file>main.c</file>
@@ -1001,7 +1001,7 @@
       </entry>
       <entry>
          <file>mcc_generated_files\device_config.c</file>
-         <hash>a5630fc00dcb9f24c7ae97bce38d2b7f582fa41bd6a00404f75f5131e467ace1</hash>
+         <hash>9a477c172c3b3b82e508750f45fd7797ebf640e99c4742115856f4f3296386c3</hash>
       </entry>
       <entry>
          <file>mcc_generated_files\pin_manager.h</file>
@@ -1009,7 +1009,7 @@
       </entry>
       <entry>
          <file>mcc_generated_files\mcc.c</file>
-         <hash>c4f4a6d8c2b530e740a13fb9b0403df0afe4277b2336eff46966d9c6f22c7233</hash>
+         <hash>1bee97e97c94417189a6a01d48d5c41b482f613dd767cadf97850e1942055dcd</hash>
       </entry>
       <entry>
          <file>mcc_generated_files\pin_manager.c</file>
