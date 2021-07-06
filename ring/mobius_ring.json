@@ -1,0 +1,14 @@
+{
+    "parameterSets": {
+        "ellipse5": {
+            "ellipse_eccentricity": "0.8",
+            "major_radius": "10.5",
+            "minor_radius": "1",
+            "shape": "ellipse",
+            "twists": "2.5",
+            "z_scale": "1.5",
+            "zebra": "1"
+        }
+    },
+    "fileFormatVersion": "1"
+}
