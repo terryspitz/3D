@@ -57,7 +57,7 @@ void PIN_MANAGER_Initialize(void)
     /**
     LATx registers
     */
-    LATA = 0x04;
+    LATA = 0x07;
 
     /**
     TRISx registers
@@ -72,7 +72,7 @@ void PIN_MANAGER_Initialize(void)
     /**
     WPUx registers
     */
-    WPUA = 0x00;
+    WPUA = 0x08;
     OPTION_REGbits.nWPUEN = 0;
 
 

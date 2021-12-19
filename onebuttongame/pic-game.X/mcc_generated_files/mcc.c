@@ -53,12 +53,14 @@ void SYSTEM_Initialize(void)
     PIN_MANAGER_Initialize();
     OSCILLATOR_Initialize();
     WDT_Initialize();
+    PWM1_Initialize();
+    TMR2_Initialize();
 }
 
 void OSCILLATOR_Initialize(void)
 {
-    // LFIOFR 31.25KHz_osc_not_ready; HFIOFS unstable; HFIOFR 16MHz_osc_not_ready; IRCF 16MHz; 
-    OSCCON = 0x70;
+    // LFIOFR 31.25KHz_osc_not_ready; HFIOFS unstable; HFIOFR 16MHz_osc_not_ready; IRCF 250KHz; 
+    OSCCON = 0x10;
     // CLKROE disabled; 
     CLKRCON = 0x00;
     // SBOREN disabled; BORFS disabled; BORRDY BOR Circuit is inactive; 
@@ -67,8 +69,8 @@ void OSCILLATOR_Initialize(void)
 
 void WDT_Initialize(void)
 {
-    // WDTPS 1:65536; SWDTEN OFF; 
-    WDTCON = 0x16;
+    // WDTPS 1:8192; SWDTEN OFF; 
+    WDTCON = 0x10;
 }
 
 /**

@@ -65,56 +65,63 @@
 #define PULL_UP_ENABLED      1
 #define PULL_UP_DISABLED     0
 
-// get/set LED_RA0 aliases
-#define LED_RA0_TRIS                 TRISAbits.TRISA0
-#define LED_RA0_LAT                  LATAbits.LATA0
-#define LED_RA0_PORT                 PORTAbits.RA0
-#define LED_RA0_WPU                  WPUAbits.WPUA0
-#define LED_RA0_ANS                  ANSELAbits.ANSA0
-#define LED_RA0_SetHigh()            do { LATAbits.LATA0 = 1; } while(0)
-#define LED_RA0_SetLow()             do { LATAbits.LATA0 = 0; } while(0)
-#define LED_RA0_Toggle()             do { LATAbits.LATA0 = ~LATAbits.LATA0; } while(0)
-#define LED_RA0_GetValue()           PORTAbits.RA0
-#define LED_RA0_SetDigitalInput()    do { TRISAbits.TRISA0 = 1; } while(0)
-#define LED_RA0_SetDigitalOutput()   do { TRISAbits.TRISA0 = 0; } while(0)
-#define LED_RA0_SetPullup()          do { WPUAbits.WPUA0 = 1; } while(0)
-#define LED_RA0_ResetPullup()        do { WPUAbits.WPUA0 = 0; } while(0)
-#define LED_RA0_SetAnalogMode()      do { ANSELAbits.ANSA0 = 1; } while(0)
-#define LED_RA0_SetDigitalMode()     do { ANSELAbits.ANSA0 = 0; } while(0)
+// get/set LED0 aliases
+#define LED0_TRIS                 TRISAbits.TRISA0
+#define LED0_LAT                  LATAbits.LATA0
+#define LED0_PORT                 PORTAbits.RA0
+#define LED0_WPU                  WPUAbits.WPUA0
+#define LED0_ANS                  ANSELAbits.ANSA0
+#define LED0_SetHigh()            do { LATAbits.LATA0 = 1; } while(0)
+#define LED0_SetLow()             do { LATAbits.LATA0 = 0; } while(0)
+#define LED0_Toggle()             do { LATAbits.LATA0 = ~LATAbits.LATA0; } while(0)
+#define LED0_GetValue()           PORTAbits.RA0
+#define LED0_SetDigitalInput()    do { TRISAbits.TRISA0 = 1; } while(0)
+#define LED0_SetDigitalOutput()   do { TRISAbits.TRISA0 = 0; } while(0)
+#define LED0_SetPullup()          do { WPUAbits.WPUA0 = 1; } while(0)
+#define LED0_ResetPullup()        do { WPUAbits.WPUA0 = 0; } while(0)
+#define LED0_SetAnalogMode()      do { ANSELAbits.ANSA0 = 1; } while(0)
+#define LED0_SetDigitalMode()     do { ANSELAbits.ANSA0 = 0; } while(0)
 
-// get/set LED_RA1 aliases
-#define LED_RA1_TRIS                 TRISAbits.TRISA1
-#define LED_RA1_LAT                  LATAbits.LATA1
-#define LED_RA1_PORT                 PORTAbits.RA1
-#define LED_RA1_WPU                  WPUAbits.WPUA1
-#define LED_RA1_ANS                  ANSELAbits.ANSA1
-#define LED_RA1_SetHigh()            do { LATAbits.LATA1 = 1; } while(0)
-#define LED_RA1_SetLow()             do { LATAbits.LATA1 = 0; } while(0)
-#define LED_RA1_Toggle()             do { LATAbits.LATA1 = ~LATAbits.LATA1; } while(0)
-#define LED_RA1_GetValue()           PORTAbits.RA1
-#define LED_RA1_SetDigitalInput()    do { TRISAbits.TRISA1 = 1; } while(0)
-#define LED_RA1_SetDigitalOutput()   do { TRISAbits.TRISA1 = 0; } while(0)
-#define LED_RA1_SetPullup()          do { WPUAbits.WPUA1 = 1; } while(0)
-#define LED_RA1_ResetPullup()        do { WPUAbits.WPUA1 = 0; } while(0)
-#define LED_RA1_SetAnalogMode()      do { ANSELAbits.ANSA1 = 1; } while(0)
-#define LED_RA1_SetDigitalMode()     do { ANSELAbits.ANSA1 = 0; } while(0)
+// get/set LED1 aliases
+#define LED1_TRIS                 TRISAbits.TRISA1
+#define LED1_LAT                  LATAbits.LATA1
+#define LED1_PORT                 PORTAbits.RA1
+#define LED1_WPU                  WPUAbits.WPUA1
+#define LED1_ANS                  ANSELAbits.ANSA1
+#define LED1_SetHigh()            do { LATAbits.LATA1 = 1; } while(0)
+#define LED1_SetLow()             do { LATAbits.LATA1 = 0; } while(0)
+#define LED1_Toggle()             do { LATAbits.LATA1 = ~LATAbits.LATA1; } while(0)
+#define LED1_GetValue()           PORTAbits.RA1
+#define LED1_SetDigitalInput()    do { TRISAbits.TRISA1 = 1; } while(0)
+#define LED1_SetDigitalOutput()   do { TRISAbits.TRISA1 = 0; } while(0)
+#define LED1_SetPullup()          do { WPUAbits.WPUA1 = 1; } while(0)
+#define LED1_ResetPullup()        do { WPUAbits.WPUA1 = 0; } while(0)
+#define LED1_SetAnalogMode()      do { ANSELAbits.ANSA1 = 1; } while(0)
+#define LED1_SetDigitalMode()     do { ANSELAbits.ANSA1 = 0; } while(0)
 
-// get/set LED_RA2 aliases
-#define LED_RA2_TRIS                 TRISAbits.TRISA2
-#define LED_RA2_LAT                  LATAbits.LATA2
-#define LED_RA2_PORT                 PORTAbits.RA2
-#define LED_RA2_WPU                  WPUAbits.WPUA2
-#define LED_RA2_ANS                  ANSELAbits.ANSA2
-#define LED_RA2_SetHigh()            do { LATAbits.LATA2 = 1; } while(0)
-#define LED_RA2_SetLow()             do { LATAbits.LATA2 = 0; } while(0)
-#define LED_RA2_Toggle()             do { LATAbits.LATA2 = ~LATAbits.LATA2; } while(0)
-#define LED_RA2_GetValue()           PORTAbits.RA2
-#define LED_RA2_SetDigitalInput()    do { TRISAbits.TRISA2 = 1; } while(0)
-#define LED_RA2_SetDigitalOutput()   do { TRISAbits.TRISA2 = 0; } while(0)
-#define LED_RA2_SetPullup()          do { WPUAbits.WPUA2 = 1; } while(0)
-#define LED_RA2_ResetPullup()        do { WPUAbits.WPUA2 = 0; } while(0)
-#define LED_RA2_SetAnalogMode()      do { ANSELAbits.ANSA2 = 1; } while(0)
-#define LED_RA2_SetDigitalMode()     do { ANSELAbits.ANSA2 = 0; } while(0)
+// get/set LED2 aliases
+#define LED2_TRIS                 TRISAbits.TRISA2
+#define LED2_LAT                  LATAbits.LATA2
+#define LED2_PORT                 PORTAbits.RA2
+#define LED2_WPU                  WPUAbits.WPUA2
+#define LED2_ANS                  ANSELAbits.ANSA2
+#define LED2_SetHigh()            do { LATAbits.LATA2 = 1; } while(0)
+#define LED2_SetLow()             do { LATAbits.LATA2 = 0; } while(0)
+#define LED2_Toggle()             do { LATAbits.LATA2 = ~LATAbits.LATA2; } while(0)
+#define LED2_GetValue()           PORTAbits.RA2
+#define LED2_SetDigitalInput()    do { TRISAbits.TRISA2 = 1; } while(0)
+#define LED2_SetDigitalOutput()   do { TRISAbits.TRISA2 = 0; } while(0)
+#define LED2_SetPullup()          do { WPUAbits.WPUA2 = 1; } while(0)
+#define LED2_ResetPullup()        do { WPUAbits.WPUA2 = 0; } while(0)
+#define LED2_SetAnalogMode()      do { ANSELAbits.ANSA2 = 1; } while(0)
+#define LED2_SetDigitalMode()     do { ANSELAbits.ANSA2 = 0; } while(0)
+
+// get/set SWITCH3 aliases
+#define SWITCH3_PORT                 PORTAbits.RA3
+#define SWITCH3_WPU                  WPUAbits.WPUA3
+#define SWITCH3_GetValue()           PORTAbits.RA3
+#define SWITCH3_SetPullup()          do { WPUAbits.WPUA3 = 1; } while(0)
+#define SWITCH3_ResetPullup()        do { WPUAbits.WPUA3 = 0; } while(0)
 
 /**
    @Param
