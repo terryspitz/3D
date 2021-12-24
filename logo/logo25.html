@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>DM Logo 25</title>
+  <script src="http://acko.net/files/mathbox2/mathbox-bundle.min.js"></script>
+  <link rel="stylesheet" href="http://acko.net/files/mathbox2/mathbox.css">
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+</head>
+<body>
+  <script>
+    var mathbox = mathBox({
+      plugins: ['core', 'controls', 'cursor'],
+      controls: {
+        klass: THREE.OrbitControls
+      },
+    });
+	if (mathbox.fallback) throw "WebGL error";
+    var three = mathbox.three;
+
+    three.camera.position.set(0, 2, 0);
+    three.renderer.setClearColor(new THREE.Color(0xFFFFFF), 1.0);
+%%javascript
+
+function reuleaux(i, j, k) {
+    if(j==0) return reuleaux(i, 19, k-1) //flatten off edge
+    var rad = (j / 10.0 - 1) * Math.PI / 3.0
+    //using Polar equation of a curve from https://en.wikipedia.org/wiki/Polar_coordinate_system
+    //R=1, r0=1/sqrt(3) (2/3 height of unit sided equilateral triangle, offset of centre of reuleaux arc)
+    var cosr = Math.cos(rad)
+    var r = (Math.sqrt(cosr*cosr + 2.0) - cosr)/Math.sqrt(3)
+    var az = i / 50.0 * Math.PI * 2.0 
+    var th = rad + (k*Math.PI + az)*2/3 //twist it!
+    //based on parametric equation of a torus
+    var x = Math.sin(az) * (1 + r * Math.cos(th))
+    var y = Math.cos(az) * (1 + r * Math.cos(th))
+    var z = r*Math.sin(th)
+    return {x: x, y: z, z: y}
+}
+
+with_mathbox(element, function(mathbox) {
+    var view = mathbox.cartesian({scale: [0.1, 0.1, 0.1]})
+    .unit({scale:1000})
+    view.voxel({
+        width: 50, height: 19, depth: 3,
+        items: 4, channels: 3,
+        expr: function (emit, i, j, k, t) {
+            var p0 = reuleaux(i,j,k); emit(p0.x, p0.y, p0.z)
+            var p1 = reuleaux(i+1,j,k); emit(p1.x, p1.y, p1.z);
+            var p2 = reuleaux(i+1,j+1,k); emit(p2.x, p2.y, p2.z);
+            var p3 = reuleaux(i,j+1,k); emit(p3.x, p3.y, p3.z);
+        }
+    })
+    for(var i=-2; i<=2; ++i)
+    for(var j=-2; j<=2; ++j)
+        view.transform({position: [-j*3.5, 0, -i*3.5]})
+            .transform({rotation: [(i+1)/Math.PI, 0, (j+2)/5.0]})
+            .face({color: (i==-2 && j==-1 )?0x60B0FF : 0xEEEEEE, shaded: false})
+            .face({color: (i==-2 && j==-1 )?0x60B0FF : 0xEEEEEE, shaded: true, opacity: 0.5})
+}) 
+
+  </script>
+</body>
+</html>

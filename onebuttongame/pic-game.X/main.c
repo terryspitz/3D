@@ -28,10 +28,10 @@
 //typedef struct { uint8_t h; uint8_t s; uint8_t v; } HSV;
 //RGB HsvToRgb(uint8_t h, uint8_t s, uint8_t v);
 
-//void delay_ms(unsigned long ms) {
-//    for(unsigned long i = 0; i<ms; ++i)
-//        __delay_ms(1);
-//}
+void delay_100ms(char hundred_ms) {
+    for(char i = 0; i<hundred_ms; ++i)
+        __delay_ms(100);
+}
 
 //void set_led(RGB rgb) {
 //    // LED duty cycle
@@ -137,27 +137,28 @@ void main(void)
     char idle_count = 0;
     while (1) {
         //intro flash red red red green
-        __delay_ms(1000);
+        delay_100ms(10);
         ++idle_count;
         for(char i=0; i<3; ++i) {
             SET_RED;
-            __delay_ms(400);
+            delay_100ms(4);
             SET_BLACK;
-            __delay_ms(500);
+            delay_100ms(2);
         }
-        //xorshift(&rand);
+        //Use xorshift algo.
+        //Can't find a single 8 bit version (which don't use multiple chars))
         rand ^= rand << 7;
         rand ^= rand >> 9;
         rand ^= rand << 8;
 
-        uint16_t delay = (rand % (1<<11)) + 500; //ms
+        char delay = (((char)rand) % 20) + 10; //tenths
         uint16_t i=0;
         for(; i<delay; ++i) {
-            __delay_ms(1);
+            delay_100ms(1);
             if(!SWITCH3_GetValue()) {
                 //pressed too soon!
                 SET_RED; 
-                __delay_ms(2000);
+                delay_100ms(20);
                 rand ^= i;
                 idle_count = 0;
                 break;
@@ -167,7 +168,7 @@ void main(void)
         {
             //light up, go!
             SET_GREEN; 
-            for(uint16_t ms=0; ms<1024; ++ms) {
+            for(char hundredths=0; hundredths<100; ++hundredths) {
                 if(!SWITCH3_GetValue()) {
                     // yay, you did it!  show the score in blue flashes 0-10
                     // from 11 subtract:
@@ -175,28 +176,31 @@ void main(void)
                     // one per 128ms if greater
 //                    char score = 11 - (i<3*128 ? (char)(i>>6) : (char)(3+(i>>7)));
                     SET_BLACK;
-                    __delay_ms(1000);
+                    delay_100ms(10);
 //                    char score = i/50;
-                    for(char ii=0; ii<(char)(ms/100); ++ii) {
+                    char tens = hundredths / 10;
+                    for(char ii=0; ii < tens; ++ii) {
                         SET_BLUE;
-                        __delay_ms(600);
+                        delay_100ms(6);
                         SET_BLACK;
-                        __delay_ms(200);
+                        delay_100ms(2);
                     }
-                    __delay_ms(1000);
-                    for(char ii=0; ii<(char)((ms/10)%10); ++ii) {
+                    delay_100ms(10);
+                    for(char ii=0; ii < hundredths % 10; ++ii) {
                         SET_BLUE;
-                        __delay_ms(400);
+                        delay_100ms(4);
                         SET_BLACK;
-                        __delay_ms(100);
+                        delay_100ms(1);
                     }
-                    rand ^= ms;
+                    rand ^= hundredths;
                     idle_count = 0;
                     break;
                 }
                 //1ms delay ==__delay_ms(1) == 63 instructions
-                //less 19 instructions in the for())
-                _delay(63-19);
+                //less 19 instructions in the for():  _delay(63-19);
+                //10ms delay ==__delay_ms(10) == 625 instructions
+                //less 13 instructions in the for():
+                _delay(625-13);
             }
         }
     
