@@ -17,13 +17,25 @@
 //const RGB DarkBlue = {0, 0, 128};
 //const RGB Black = {0, 0, 0};
 
-#define SET_BLACK PORTA = (unsigned char)~0
-#define SET_RED PORTA = (unsigned char)~1
-#define SET_GREEN PORTA = (unsigned char)~4
-#define SET_BLUE PORTA = (unsigned char)~2
-#define SET_MAGENTA PORTA = (unsigned char)~(2+1)
-#define SET_CYAN PORTA = (unsigned char)~(4+2)
-#define SET_YELLOW PORTA = (unsigned char)~(4+1)
+const unsigned char black = (unsigned char)~0;
+const unsigned char red = (unsigned char)~1;
+const unsigned char green = (unsigned char)~4;
+const unsigned char blue = (unsigned char)~2;
+#define magenta (unsigned char)~(2+1)
+#define cyan (unsigned char)~(4+2)
+#define yellow (unsigned char)~(4+1)
+
+#define SET_BLACK PORTA = black
+#define SET_RED PORTA = red
+#define SET_GREEN PORTA = green
+#define SET_BLUE PORTA = blue
+#define SET_MAGENTA PORTA = magenta
+#define SET_CYAN PORTA = cyan
+#define SET_YELLOW PORTA = yellow
+
+//not: black, red, green, blue
+const unsigned char distract_colour[] = { magenta, cyan, yellow };
+const unsigned char distract_colours = 3;
 
 //typedef struct { uint8_t h; uint8_t s; uint8_t v; } HSV;
 //RGB HsvToRgb(uint8_t h, uint8_t s, uint8_t v);
@@ -31,6 +43,14 @@
 void delay_100ms(char hundred_ms) {
     for(char i = 0; i<hundred_ms; ++i)
         __delay_ms(100);
+}
+
+void xorshift(uint16_t *rand) {
+    //Can't find a single 8 bit version 
+    //(which doesn't use multiple chars, so might as well use a uint16_t)
+    *rand ^= *rand << 7;
+    *rand ^= *rand >> 9;
+    *rand ^= *rand << 8;
 }
 
 //void set_led(RGB rgb) {
@@ -49,6 +69,9 @@ void sleep_for_button(void) {
         NOP();
         WDTCONbits.SWDTEN = 0;
     }
+    SET_YELLOW;
+    delay_100ms(3);
+    SET_BLACK;
 }
 
 
@@ -58,12 +81,14 @@ void main(void)
 //    INTERRUPT_GlobalInterruptDisable();
 //    INTERRUPT_PeripheralInterruptDisable();
 
-//#define FLASH_RGB
-#ifdef FLASH_RGB
+// Test sleep
 //        SET_BLACK;
 //        NOP();
 ////        SLEEP();  //works when IOC off
 //        NOP();
+
+//#define FLASH_RGB
+#ifdef FLASH_RGB
     while (1) {
         SET_RED;
         __delay_ms(1000);
@@ -90,14 +115,10 @@ void main(void)
         PWM1CONbits.PWM1OE = 1;
         __delay_ms(1000);
         PWM1CONbits.PWM1OE = 0;
-//        SET_BLACK;
-//        __delay_ms(500);
-//        SET_MAGENTA;
-//        __delay_ms(1000);
-//        SET_CYAN;
-//        __delay_ms(1000);
-//        SET_BLACK;
-//        __delay_ms(500);
+        SET_CYAN;
+        __delay_ms(1000);
+        SET_BLACK;
+        __delay_ms(500);
         sleep_for_button();
     }
 #endif
@@ -135,6 +156,7 @@ void main(void)
 // REACTION TIME GAME
     uint16_t rand = 0;
     char idle_count = 0;
+    char games_since_sleep = 0;
     while (1) {
         //intro flash red red red green
         delay_100ms(10);
@@ -145,48 +167,62 @@ void main(void)
             SET_BLACK;
             delay_100ms(2);
         }
-        //Use xorshift algo.
-        //Can't find a single 8 bit version (which don't use multiple chars))
-        rand ^= rand << 7;
-        rand ^= rand >> 9;
-        rand ^= rand << 8;
+        xorshift(&rand);
+        char colours;
+        if(games_since_sleep % 10 >=5)
+            colours = ((char)rand) % 5 + 2; //distraction colour to show before green
+        else 
+            colours = 1; // original game, just black before green
 
-        char delay = (((char)rand) % 20) + 10; //tenths
-        uint16_t i=0;
-        for(; i<delay; ++i) {
-            delay_100ms(1);
-            if(!SWITCH3_GetValue()) {
-                //pressed too soon!
-                SET_RED; 
-                delay_100ms(20);
-                rand ^= i;
-                idle_count = 0;
-                break;
+        unsigned char delay;
+        unsigned char i, r;
+        for(r=0; r<colours; ++r) {
+
+            if(r==0)
+                PORTA = black;
+            else {
+                xorshift(&rand);
+                char col = ((char)rand) % distract_colours;
+                PORTA = distract_colour[col];
             }
+            xorshift(&rand);
+            if(games_since_sleep % 10 >=5)
+                delay = ((char)rand) % 10 + 5; //tenths
+            else
+                delay = ((char)rand) % 20 + 10; //tenths
+            for(i=0; i<delay; ++i) {
+                delay_100ms(1);
+                if(!SWITCH3_GetValue()) {
+                    //pressed too soon!
+                    SET_RED; 
+                    delay_100ms(20);
+                    rand ^= i;
+                    idle_count = 0;
+                    break;
+                }
+            }
+            if(i!=delay) break; //pressed too soon, break out
         }
-        if(i==delay) 
+        if(i==delay)
         {
             //light up, go!
-            SET_GREEN; 
+            SET_GREEN;
+            
+            //measure reaction time
             for(char hundredths=0; hundredths<100; ++hundredths) {
                 if(!SWITCH3_GetValue()) {
                     // yay, you did it!  show the score in blue flashes 0-10
-                    // from 11 subtract:
-                    // one per 64ms if less than 384ms
-                    // one per 128ms if greater
-//                    char score = 11 - (i<3*128 ? (char)(i>>6) : (char)(3+(i>>7)));
                     SET_BLACK;
                     delay_100ms(10);
-//                    char score = i/50;
-                    char tens = hundredths / 10;
-                    for(char ii=0; ii < tens; ++ii) {
+                    if(hundredths>50) hundredths=50;
+                    for(char i=0; i < hundredths / 10; ++i) {
                         SET_BLUE;
                         delay_100ms(6);
                         SET_BLACK;
                         delay_100ms(2);
                     }
                     delay_100ms(10);
-                    for(char ii=0; ii < hundredths % 10; ++ii) {
+                    for(char i=0; i < hundredths % 10; ++i) {
                         SET_BLUE;
                         delay_100ms(4);
                         SET_BLACK;
@@ -207,7 +243,9 @@ void main(void)
         SET_BLACK;
         if(idle_count>=1) {
             sleep_for_button();
+            games_since_sleep = 0;
         }
+        games_since_sleep++;
     }
     
 // SIMON SAYS
