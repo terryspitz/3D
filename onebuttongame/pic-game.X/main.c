@@ -8,7 +8,6 @@
 //};
 
 //typedef struct { uint8_t r; uint8_t g; uint8_t b; } RGB;
-
 //const RGB Red = {255, 0, 0};
 //const RGB Green = {0, 255, 0};
 //const RGB Blue = {0, 0, 255};
@@ -17,10 +16,10 @@
 //const RGB DarkBlue = {0, 0, 128};
 //const RGB Black = {0, 0, 0};
 
-const unsigned char black = (unsigned char)~0;
-const unsigned char red = (unsigned char)~1;
-const unsigned char green = (unsigned char)~4;
-const unsigned char blue = (unsigned char)~2;
+#define black (unsigned char)~0
+#define red (unsigned char)~1
+#define green (unsigned char)~4
+#define blue (unsigned char)~2
 #define magenta (unsigned char)~(2+1)
 #define cyan (unsigned char)~(4+2)
 #define yellow (unsigned char)~(4+1)
@@ -153,15 +152,105 @@ void main(void)
     }
 #endif
 
-// REACTION TIME GAME
+#define RHYTHM_GAMES
+#ifdef RHYTHM_GAMES
+    uint16_t rand = 0xB6;
+    char idle_count = 0;
+    char games_since_sleep = 0;
+#define on_tenths 4
+#define off_tenths 2
+
+    while(1) {
+        unsigned char size = (games_since_sleep>5) ? 8 : 4;
+        xorshift(&rand);
+        //bits of pattern define the rhythm
+        unsigned char pattern = ((unsigned char)rand) | 0x1;
+        ++idle_count;
+        //INTRO
+        for(char beats=0; beats<size; ++beats) {
+            SET_RED;
+            delay_100ms(on_tenths);
+            SET_BLACK;
+            delay_100ms(off_tenths);
+        }
+        //SHOW PATTERN
+        for(char repeat=0; repeat<2; ++repeat) {
+            for(char beats=0; beats<size; ++beats) {
+                if(pattern & (1 << beats))
+                    SET_GREEN;
+                delay_100ms(on_tenths);
+                SET_BLACK;
+                delay_100ms(off_tenths);
+            }
+        }
+        //CHECK INPUT MATCHES PATTERN
+        char repeat, beats;
+        for(repeat=0; repeat<2; ++repeat) {
+            for(beats=0; beats<size; ++beats) {
+                char tenths;
+                char pressed = 0;
+                char on = pattern & (1 << beats);
+                for(tenths=0; tenths<on_tenths; ++tenths) {
+                    if(!SWITCH3_GetValue()) {
+                        pressed = 1;
+                        if(on)
+                            SET_BLUE;
+                        else
+                            break;
+                        idle_count = 0;
+                    }
+                    else
+                        SET_BLACK;
+                    delay_100ms(1);
+                }
+                if((on && !pressed)
+                        || tenths != on_tenths) {
+                    //FAIL
+                    SET_RED;
+                    delay_100ms(10);
+                    break;
+                }
+
+                SET_BLACK;
+                delay_100ms(off_tenths);
+            }
+            if(beats!=size) break; //skip outer loop
+        }
+        if(beats==size && repeat==2) {
+            //WIN!
+            SET_GREEN;
+            delay_100ms(10);
+        }
+
+        SET_BLACK;
+        delay_100ms(2);
+        if(idle_count>=1) {
+            sleep_for_button();
+            games_since_sleep = 0;
+        }
+        games_since_sleep++;
+    } //while
+#endif
+//#define REACTION_TIME_GAMES
+#ifdef REACTION_TIME_GAMES
+    //game1: red red red pause green, show time
+    //game2: red red red pause [distraction colours] green, show time
+    //game3: red red red red green, show time
     uint16_t rand = 0;
     char idle_count = 0;
     char games_since_sleep = 0;
+    char game;
+    
     while (1) {
-        //intro flash red red red green
+//        if(games_since_sleep % 10 >=5)
+//            game = 2;
+//        else
+//            game = 1;
+        game = 3;
+        //intro flash red red red
         delay_100ms(10);
         ++idle_count;
-        for(char i=0; i<3; ++i) {
+        for(char i=0; i<(game < 3 ? 3 : 4); ++i) {
             SET_RED;
             delay_100ms(4);
             SET_BLACK;
@@ -169,15 +258,15 @@ void main(void)
         }
         xorshift(&rand);
         char colours;
-        if(games_since_sleep % 10 >=5)
+        if(game == 2)
             colours = ((char)rand) % 5 + 2; //distraction colour to show before green
-        else 
-            colours = 1; // original game, just black before green
+        else if(game == 1 || game == 3)
+            colours = 1; // just black before green
 
         unsigned char delay;
         unsigned char i, r;
-        for(r=0; r<colours; ++r) {
-
+        for(r=0; r<colours; ++r) 
+        {
             if(r==0)
                 PORTA = black;
             else {
@@ -186,10 +275,17 @@ void main(void)
                 PORTA = distract_colour[col];
             }
             xorshift(&rand);
-            if(games_since_sleep % 10 >=5)
-                delay = ((char)rand) % 10 + 5; //tenths
-            else
-                delay = ((char)rand) % 20 + 10; //tenths
+            switch(game) {
+                case 1:
+                    delay = ((char)rand) % 20 + 10; //tenths
+                    break;
+                case 2:
+                    delay = ((char)rand) % 10 + 5; //tenths
+                    break;
+                case 3:
+                    delay = 0; //tenths
+                    break;
+            }
             for(i=0; i<delay; ++i) {
                 delay_100ms(1);
                 if(!SWITCH3_GetValue()) {
@@ -246,8 +342,9 @@ void main(void)
             games_since_sleep = 0;
         }
         games_since_sleep++;
-    }
-    
+    } //while
+#endif
+
 // SIMON SAYS
 //    uint16_t rand1 = 1;
 //    uint16_t steps = 1;
