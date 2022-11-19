@@ -1,7 +1,0 @@
-{
-    "files.associations": {
-        "*.json": "json",
-        "dos.h": "c",
-        "corecrt.h": "c"
-    }
-}
